@@ -28,7 +28,7 @@
 
     .api-tester-button {
         background-color: #814357; // Переносим фон на кнопку
-        margin-inline-start: 43%;
+        margin-inline-start: 0%;
         color: white;
         border: none; // Убираем стандартную границу
         padding: 12px 40px;
@@ -336,6 +336,120 @@
                     background-color: #ff6b6b;
                     color: white;
                 }
+            }
+        }
+    }
+}
+// Стили для подсказки внизу с оформленной кнопкой
+.api-hint {
+    margin-top: 40px;
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid #e0e0e0;
+    background: linear-gradient(to bottom, #f9f9f9, #f0f0f0);
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+
+    .hint-text {
+        font-size: 18px;
+        color: #555;
+        font-weight: 500;
+        text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .hint-button {
+        background: linear-gradient(135deg, #5f0909 0%, #ddb7b7 100%);
+        border: 2px solid #461010;
+        border-radius: 50px;
+        padding: 12px 30px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(232, 178, 178, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            border-color: #460000;
+            background: linear-gradient(135deg, #891818 0%, #e6babd 100%);
+
+            &::before {
+                left: 100%;
+            }
+        }
+
+        &:active {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.4);
+        }
+
+        .hint-button-text {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.5px;
+        }
+
+        .hint-button-icon {
+            color: white;
+            font-size: 20px;
+            filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
+            animation: bounce 2s infinite;
+        }
+    }
+}
+
+// Анимация для иконки
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+// Адаптивность для мобильных устройств
+@media (max-width: 768px) {
+    .api-hint {
+        flex-direction: column;
+        gap: 10px;
+        padding: 15px;
+
+        .hint-text {
+            font-size: 16px;
+        }
+
+        .hint-button {
+            padding: 10px 25px;
+
+            .hint-button-text {
+                font-size: 16px;
+            }
+
+            .hint-button-icon {
+                font-size: 18px;
             }
         }
     }

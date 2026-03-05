@@ -36,7 +36,23 @@ function App() {
             <div className="header-with-button">
                 <h1>Veresk </h1>
                 <h33>магазин украшений из эпоксидной смолы</h33>
-                <button 
+            </div>
+
+            {/* Добавляем табы для переключения между разделами */}
+            <div className="tabs">
+                <button
+                    className={`tab ${activeTab === 'users' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('users')}
+                >
+                    Пользователи
+                </button>
+                <button
+                    className={`tab ${activeTab === 'products' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('products')}
+                >
+                    Товары
+                </button>
+                <button
                     className="api-tester-button"
                     onClick={openAPITester}
                     title="Открыть тестер API в новом окне"
@@ -44,32 +60,16 @@ function App() {
                     <span className="button-text">API Tester</span>
                 </button>
             </div>
-            
-            {/* Добавляем табы для переключения между разделами */}
-            <div className="tabs">
-                <button 
-                    className={`tab ${activeTab === 'users' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('users')}
-                >
-                    Пользователи
-                </button>
-                <button 
-                    className={`tab ${activeTab === 'products' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('products')}
-                >
-                    Товары
-                </button>
-            </div>
 
             <div className="content">
                 {activeTab === 'users' ? (
                     <>
-                        <UserForm 
+                        <UserForm
                             onUserAdded={handleUserAdded}
                             onUserUpdated={handleUserUpdated}
                             userToEdit={userToEdit}
                         />
-                        <UserList 
+                        <UserList
                             onEditUser={handleEditUser}
                             refreshTrigger={refreshTrigger}
                         />
@@ -79,17 +79,18 @@ function App() {
                 )}
             </div>
 
-            {/* Маленькая подсказка внизу */}
+            {/* Подсказка внизу с оформленной кнопкой */}
             <div className="api-hint">
                 <span className="hint-text">
-                    Проверить все эндпоинты API в 
-                    <button 
-                        className="hint-link" 
-                        onClick={openAPITester}
-                    >
-                        интерактивном тестере
-                    </button>
+                    Проверить все эндпоинты API в
                 </span>
+                <button
+                    className="hint-button"
+                    onClick={openAPITester}
+                >
+                    <span className="hint-button-text">интерактивном тестере</span>
+                    <span className="hint-button-icon">🔍</span>
+                </button>
             </div>
         </div>
     );

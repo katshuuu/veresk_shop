@@ -18,10 +18,10 @@ let users = [
 ];
 
 let products = [
-    { id: 1, name: 'Кулон "Лесная фея"', price: 2500, category: 'кулоны', inStock: true, orders: 15 },
-    { id: 2, name: 'Серьги "Северное сияние"', price: 3200, category: 'серьги', inStock: true, orders: 8 },
-    { id: 3, name: 'Браслет "Мятный бриз"', price: 1800, category: 'браслеты', inStock: false, orders: 23 },
-    { id: 4, name: 'Кольцо "Розовый кварц"', price: 1500, category: 'кольца', inStock: true, orders: 12 }
+    { id: 1, name: 'Кулон "Просто супер"', price: 2500, category: 'кулоны', inStock: true, orders: 15 },
+    { id: 2, name: 'Серьги "Супер класс"', price: 3200, category: 'серьги', inStock: true, orders: 8 },
+    { id: 3, name: 'Браслет "Мегахороший"', price: 1800, category: 'браслеты', inStock: false, orders: 23 },
+    { id: 4, name: 'Кольцо "Пушка"', price: 1500, category: 'кольца', inStock: true, orders: 12 }
 ];
 
 // Пр4. REST API CRUD (User)
