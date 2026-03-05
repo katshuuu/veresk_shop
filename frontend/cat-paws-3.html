@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Кошачьи лапки 🐾</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: #1a1625;
+    font-family: 'Comfortaa', cursive;
+    overflow: hidden;
+    cursor: crosshair;
+  }
+
+  #paw-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .center-content {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    opacity: 0.9;
+    letter-spacing: 2px;
+  }
+  .title span { color: #ff9ed2; }
+
+  .subtitle {
+    font-size: clamp(0.9rem, 2vw, 1.2rem);
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    letter-spacing: 1px;
+  }
+
+  #paw-btn {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #ff9ed2, #c87dff);
+    font-size: 34px;
+    cursor: pointer;
+    box-shadow: 0 4px 24px rgba(255,158,210,0.5);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #paw-btn:hover { transform: scale(1.1); box-shadow: 0 6px 32px rgba(255,158,210,0.7); }
+  #paw-btn:active { transform: scale(0.93); }
+  #paw-btn.active {
+    background: linear-gradient(135deg, #c87dff, #ff9ed2);
+    box-shadow: 0 4px 32px rgba(200,125,255,0.8);
+  }
+
+  #mode-label {
+    position: fixed;
+    bottom: 50px;
+    right: 126px;
+    font-family: 'Comfortaa', cursive;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.08);
+    padding: 8px 16px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.12);
+    white-space: nowrap;
+    z-index: 9997;
+  }
+
+  #counter {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    font-family: 'Comfortaa', cursive;
+    font-size: 1rem;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+    z-index: 200;
+  }
+  #counter span { color: #ff9ed2; font-weight: 700; }
+
+  #clear-btn {
+    position: fixed;
+    top: 30px;
+    left: 30px;
+    font-family: 'Comfortaa', cursive;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    z-index: 200;
+    transition: all 0.2s;
+  }
+  #clear-btn:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.12); }
+
+  /* ===== ANIMATED CAT ARM ===== */
+  #cat-arm-wrap {
+    position: fixed;
+    pointer-events: none;
+    z-index: 500;
+    /* positioned by JS */
+  }
+
+  #cat-arm-svg {
+    display: block;
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,0.5));
+  }
+
+  /* Press squish: arm scales down slightly when stamping */
+  #cat-arm-wrap.pressing #cat-arm-svg {
+    transform-origin: 50% 100%;
+    animation: armPress 0.18s ease-out;
+  }
+  @keyframes armPress {
+    0%   { transform: scaleY(1); }
+    40%  { transform: scaleY(0.88); }
+    100% { transform: scaleY(1); }
+  }
+
+  /* Fur wiggle idle */
+  @keyframes furWiggle {
+    0%,100% { transform: rotate(0deg); }
+    25%     { transform: rotate(1.5deg); }
+    75%     { transform: rotate(-1.5deg); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="paw-canvas"></canvas>
+
+<!-- Animated cat arm -->
+<div id="cat-arm-wrap">
+  <svg id="cat-arm-svg" width="160" height="340" viewBox="0 0 160 340" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Fur gradient — warm ginger tabby -->
+      <linearGradient id="furGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%"   stop-color="#c8864a"/>
+        <stop offset="40%"  stop-color="#e0a060"/>
+        <stop offset="70%"  stop-color="#d09050"/>
+        <stop offset="100%" stop-color="#b07030"/>
+      </linearGradient>
+      <linearGradient id="furGradDark" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%"   stop-color="#9a6030"/>
+        <stop offset="50%"  stop-color="#c07840"/>
+        <stop offset="100%" stop-color="#8a5020"/>
+      </linearGradient>
+      <!-- Paw pad gradient -->
+      <radialGradient id="padGrad" cx="50%" cy="40%" r="60%">
+        <stop offset="0%"   stop-color="#e8a0b0"/>
+        <stop offset="100%" stop-color="#c06878"/>
+      </radialGradient>
+      <radialGradient id="toeGrad" cx="50%" cy="40%" r="60%">
+        <stop offset="0%"   stop-color="#ebb0be"/>
+        <stop offset="100%" stop-color="#c87888"/>
+      </radialGradient>
+      <!-- Fur stripe marks -->
+      <pattern id="stripes" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(80)">
+        <rect width="20" height="20" fill="none"/>
+        <line x1="0" y1="0" x2="0" y2="20" stroke="#a06028" stroke-width="3" stroke-opacity="0.35"/>
+      </pattern>
+      <!-- Clip for arm shape -->
+      <clipPath id="armClip">
+        <path d="M 20,0 Q 10,80 8,160 Q 6,240 18,290 Q 30,330 80,338 Q 130,330 142,290 Q 154,240 152,160 Q 150,80 140,0 Z"/>
+      </clipPath>
+    </defs>
+
+    <!-- ARM BODY -->
+    <!-- Shadow/depth left -->
+    <path d="M 20,0 Q 10,80 8,160 Q 6,240 18,290 Q 30,330 80,338 Q 130,330 142,290 Q 154,240 152,160 Q 150,80 140,0 Z"
+          fill="url(#furGradDark)" />
+    <!-- Main fur surface -->
+    <path d="M 30,0 Q 22,80 20,160 Q 18,240 28,288 Q 40,328 80,334 Q 120,328 132,288 Q 142,240 140,160 Q 138,80 130,0 Z"
+          fill="url(#furGrad)" />
+    <!-- Stripe texture overlay -->
+    <path d="M 30,0 Q 22,80 20,160 Q 18,240 28,288 Q 40,328 80,334 Q 120,328 132,288 Q 142,240 140,160 Q 138,80 130,0 Z"
+          fill="url(#stripes)" opacity="0.5"/>
+    <!-- Lighter center highlight -->
+    <path d="M 55,0 Q 50,100 52,200 Q 54,270 62,310 Q 70,332 80,334 Q 90,332 98,310 Q 106,270 108,200 Q 110,100 105,0 Z"
+          fill="#e8b070" opacity="0.35"/>
+
+    <!-- FUR TEXTURE — small stroke lines along edges -->
+    <g stroke="#a06028" stroke-width="1.2" stroke-opacity="0.4" stroke-linecap="round" fill="none">
+      <line x1="22" y1="30"  x2="14" y2="44"/>
+      <line x1="20" y1="60"  x2="11" y2="74"/>
+      <line x1="18" y1="100" x2="10" y2="114"/>
+      <line x1="16" y1="140" x2="8"  y2="155"/>
+      <line x1="138" y1="30"  x2="146" y2="44"/>
+      <line x1="140" y1="60"  x2="148" y2="74"/>
+      <line x1="142" y1="100" x2="150" y2="114"/>
+      <line x1="144" y1="140" x2="152" y2="155"/>
+      <!-- tabby stripe marks -->
+      <path d="M 32,70 Q 50,65 68,70" stroke-width="2.5" stroke-opacity="0.3"/>
+      <path d="M 92,70 Q 110,65 128,70" stroke-width="2.5" stroke-opacity="0.3"/>
+      <path d="M 28,130 Q 50,123 72,130" stroke-width="2.5" stroke-opacity="0.3"/>
+      <path d="M 88,130 Q 110,123 132,130" stroke-width="2.5" stroke-opacity="0.3"/>
+      <path d="M 26,195 Q 50,186 74,195" stroke-width="2.5" stroke-opacity="0.3"/>
+      <path d="M 86,195 Q 110,186 134,195" stroke-width="2.5" stroke-opacity="0.3"/>
+    </g>
+
+    <!-- WRIST / TRANSITION TO PAW -->
+    <ellipse cx="80" cy="290" rx="52" ry="18" fill="#c07040" opacity="0.5"/>
+
+    <!-- PAW — MAIN PALM PAD (pink) -->
+    <ellipse cx="80" cy="316" rx="36" ry="26" fill="url(#padGrad)"/>
+    <!-- Palm pad highlight -->
+    <ellipse cx="72" cy="308" rx="14" ry="10" fill="white" opacity="0.18"/>
+    <!-- Palm pad inner texture line -->
+    <path d="M 58,318 Q 80,326 102,318" stroke="#b05868" stroke-width="1.5" fill="none" opacity="0.4"/>
+
+    <!-- TOE BEANS (4 toes) -->
+    <!-- Left outer -->
+    <ellipse cx="42" cy="295" rx="13" ry="15" fill="url(#toeGrad)"/>
+    <ellipse cx="39" cy="290" rx="5"  ry="4"  fill="white" opacity="0.22"/>
+    <!-- Left inner -->
+    <ellipse cx="62" cy="284" rx="14" ry="16" fill="url(#toeGrad)"/>
+    <ellipse cx="59" cy="279" rx="5"  ry="4"  fill="white" opacity="0.22"/>
+    <!-- Right inner -->
+    <ellipse cx="98" cy="284" rx="14" ry="16" fill="url(#toeGrad)"/>
+    <ellipse cx="95" cy="279" rx="5"  ry="4"  fill="white" opacity="0.22"/>
+    <!-- Right outer -->
+    <ellipse cx="118" cy="295" rx="13" ry="15" fill="url(#toeGrad)"/>
+    <ellipse cx="115" cy="290" rx="5"  ry="4"  fill="white" opacity="0.22"/>
+
+    <!-- CLAWS (barely visible, retracted) -->
+    <g fill="#d4a0a8" opacity="0.55">
+      <path d="M 38,280 Q 34,272 36,266 Q 39,273 42,280 Z"/>
+      <path d="M 58,269 Q 55,260 57,254 Q 61,261 63,269 Z"/>
+      <path d="M 97,269 Q 99,260 103,254 Q 105,261 102,269 Z"/>
+      <path d="M 118,280 Q 122,272 124,266 Q 121,273 118,280 Z"/>
+    </g>
+  </svg>
+</div>
+
+<div class="center-content">
+  <div class="title">Нажимай на экран<br><span>🐾 Кошачьи лапки</span></div>
+  <div class="subtitle">Активируй режим лапки и кликай куда хочешь</div>
+</div>
+
+<div id="counter">Отпечатков: <span id="count">0</span></div>
+<button id="clear-btn">Очистить</button>
+<div id="mode-label">Режим: обычный</div>
+<button id="paw-btn">🐾</button>
+
+<script>
+// ===== CANVAS =====
+const canvas = document.getElementById('paw-canvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  // Save existing drawing
+  const tmp = document.createElement('canvas');
+  tmp.width = canvas.width; tmp.height = canvas.height;
+  tmp.getContext('2d').drawImage(canvas, 0, 0);
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  ctx.drawImage(tmp, 0, 0);
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// ===== STATE =====
+let pawMode = false;
+let pawCount = 0;
+const paws = [];
+
+// ===== AUDIO =====
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playMeow() {
+  try {
+    const ac = getAudio();
+    const dur = 0.35 + Math.random() * 0.45;
+    const f0 = 550 + Math.random() * 500;
+    const f1 = 280 + Math.random() * 220;
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    const filt = ac.createBiquadFilter();
+    osc.connect(filt); filt.connect(gain); gain.connect(ac.destination);
+    filt.type = 'bandpass'; filt.frequency.value = 1100; filt.Q.value = 4;
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(f0, ac.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(f1, ac.currentTime + dur * 0.65);
+    osc.frequency.exponentialRampToValueAtTime(f0 * 0.75, ac.currentTime + dur);
+    gain.gain.setValueAtTime(0, ac.currentTime);
+    gain.gain.linearRampToValueAtTime(0.2, ac.currentTime + 0.04);
+    gain.gain.linearRampToValueAtTime(0.1, ac.currentTime + dur * 0.55);
+    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
+    osc.start(ac.currentTime);
+    osc.stop(ac.currentTime + dur);
+  } catch(e) {}
+}
+
+// ===== DIRTY PAW DRAWING =====
+// Seeded jitter — each paw gets unique but stable smudge pattern
+function seededJitter(seed, rx, factor = 0.25) {
+  const s = Math.sin(seed * 9301 + 49297) * 0.5 + 0.5;
+  return (s - 0.5) * rx * factor * 2;
+}
+
+function drawDirtyEllipse(ctx, x, y, rx, ry, tilt, seed) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(tilt);
+  ctx.beginPath();
+  const j = (i) => seededJitter(seed + i, rx);
+  ctx.moveTo(j(0), -ry + j(1));
+  ctx.bezierCurveTo(
+    rx * 0.55 + j(2),  -ry * 0.55 + j(3),
+    rx + j(4),          ry * 0.25 + j(5),
+    j(6),               ry + j(7)
+  );
+  ctx.bezierCurveTo(
+    -rx * 0.55 + j(8), ry * 0.7 + j(9),
+    -rx + j(10),       -ry * 0.25 + j(11),
+    j(12),             -ry + j(13)
+  );
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawPaw(cx, cy, angleDeg, scale, color, alpha, seed) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.translate(cx, cy);
+  ctx.rotate(angleDeg * Math.PI / 180);
+  ctx.scale(scale, scale);
+
+  // === PALM PAD ===
+  const pw = 30, ph = 24;
+  // Base pad
+  drawDirtyEllipse(ctx, 0, 0, pw, ph, 0.12, seed);
+
+  // Extra smear streaks — "muddy" look
+  const smearAlpha = alpha * 0.28;
+  ctx.save();
+  ctx.globalAlpha = smearAlpha;
+  drawDirtyEllipse(ctx, -8,  5, pw * 0.65, ph * 0.45,  0.45, seed + 20);
+  drawDirtyEllipse(ctx,  9, -4, pw * 0.55, ph * 0.40, -0.3,  seed + 40);
+  drawDirtyEllipse(ctx,  2,  8, pw * 0.50, ph * 0.38,  0.2,  seed + 60);
+  drawDirtyEllipse(ctx, -4, -7, pw * 0.45, ph * 0.35, -0.5,  seed + 80);
+  ctx.restore();
+
+  // === 4 TOE BEANS ===
+  const toes = [
+    { ox: -19, oy: -28, rx: 11, ry: 12, rot: -0.38 },
+    { ox:  -6, oy: -35, rx: 12, ry: 13, rot: -0.10 },
+    { ox:   7, oy: -35, rx: 12, ry: 13, rot:  0.10 },
+    { ox:  19, oy: -28, rx: 11, ry: 12, rot:  0.38 },
+  ];
+
+  toes.forEach((t, i) => {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(t.ox, t.oy);
+    ctx.rotate(t.rot);
+
+    // Main toe
+    drawDirtyEllipse(ctx, 0, 0, t.rx, t.ry, 0, seed + 100 + i * 30);
+
+    // Smear on each toe
+    ctx.globalAlpha = alpha * 0.25;
+    drawDirtyEllipse(ctx, -2,  3, t.rx * 0.6, t.ry * 0.5,  0.4, seed + 110 + i * 30);
+    drawDirtyEllipse(ctx,  3, -2, t.rx * 0.5, t.ry * 0.4, -0.3, seed + 120 + i * 30);
+    ctx.restore();
+  });
+
+  ctx.restore();
+}
+
+// ===== PALETTE — earthy dirty tones =====
+const COLORS = [
+  '#b8956a', '#9a7245', '#7d5535', '#6b4428',
+  '#c4a47c', '#a07850', '#8b6040', '#d0ae8a',
+];
+
+// ===== SPAWN =====
+function spawnPaw(x, y) {
+  const angle    = Math.random() * 360;          // полностью случайный угол
+  const scale    = 1.3 + Math.random() * 1.1;   // большой размер
+  const color    = COLORS[Math.floor(Math.random() * COLORS.length)];
+  const seed     = Math.random() * 9999;
+  const lifetime = 5000 + Math.random() * 4000;
+
+  paws.push({ x, y, angle, scale, color, alpha: 1, born: performance.now(), lifetime, seed });
+  drawPaw(x, y, angle, scale, color, 1, seed);
+
+  playMeow();
+  pawCount++;
+  document.getElementById('count').textContent = pawCount;
+}
+
+// ===== FADE LOOP =====
+let lastT = 0;
+function loop(ts) {
+  requestAnimationFrame(loop);
+  if (ts - lastT < 40) return; // ~25fps enough for fading
+  lastT = ts;
+
+  const anyFading = paws.some(p => p.alpha < 1 && p.alpha > 0);
+  if (!anyFading) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (const p of paws) {
+    const age = ts - p.born;
+    const fadeStart = p.lifetime * 0.55;
+    if (age >= fadeStart) {
+      p.alpha = Math.max(0, 1 - (age - fadeStart) / (p.lifetime * 0.45));
+    }
+    if (p.alpha > 0) drawPaw(p.x, p.y, p.angle, p.scale, p.color, p.alpha, p.seed);
+  }
+
+  // Remove dead
+  for (let i = paws.length - 1; i >= 0; i--) {
+    if (paws[i].alpha <= 0) paws.splice(i, 1);
+  }
+}
+requestAnimationFrame(loop);
+
+// ===== CONTROLS =====
+const pawBtn    = document.getElementById('paw-btn');
+const modeLabel = document.getElementById('mode-label');
+
+pawBtn.addEventListener('click', () => {
+  pawMode = !pawMode;
+  pawBtn.classList.toggle('active', pawMode);
+  modeLabel.textContent = pawMode ? '🐾 Режим: лапка!' : 'Режим: обычный';
+  document.body.style.cursor = pawMode ? 'none' : 'crosshair';
+  fakeCursor.style.display = pawMode ? 'block' : 'none';
+});
+
+document.addEventListener('click', e => {
+  if (e.target === pawBtn || e.target === document.getElementById('clear-btn')) return;
+  if (pawMode) triggerArm(e.clientX, e.clientY);
+});
+
+document.addEventListener('touchstart', e => {
+  if (!pawMode) return;
+  const t = e.touches[0];
+  triggerArm(t.clientX, t.clientY);
+}, { passive: true });
+
+document.getElementById('clear-btn').addEventListener('click', () => {
+  paws.length = 0;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  pawCount = 0;
+  document.getElementById('count').textContent = 0;
+});
+
+// ===== CUSTOM PAW CURSOR =====
+const fakeCursor = document.createElement('canvas');
+fakeCursor.width = 90; fakeCursor.height = 90;
+fakeCursor.style.cssText = 'position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);display:none;';
+document.body.appendChild(fakeCursor);
+const fcc = fakeCursor.getContext('2d');
+
+// Pre-draw cursor paw
+(function() {
+  fcc.save();
+  fcc.translate(45, 50);
+  fcc.globalAlpha = 0.7;
+  fcc.fillStyle = '#c4a47c';
+  // palm
+  fcc.beginPath(); fcc.ellipse(0, 5, 14, 11, 0, 0, Math.PI*2); fcc.fill();
+  // toes
+  [[-10,-11],[-3,-17],[4,-17],[11,-11]].forEach(([tx,ty]) => {
+    fcc.beginPath(); fcc.ellipse(tx, ty, 6, 7, 0, 0, Math.PI*2); fcc.fill();
+  });
+  fcc.restore();
+})();
+
+document.addEventListener('mousemove', e => {
+  if (!pawMode) return;
+  fakeCursor.style.left = e.clientX + 'px';
+  fakeCursor.style.top  = e.clientY + 'px';
+});
+
+// ===== ANIMATED CAT ARM =====
+const armWrap = document.getElementById('cat-arm-wrap');
+const armSvg  = document.getElementById('cat-arm-svg');
+
+const ARM_W = 160;
+const ARM_H = 340;
+const PAW_TIP_Y = 330;
+
+let armAnim = null;
+
+function setArmTransform(x, y, rotate) {
+  armWrap.style.left = x + 'px';
+  armWrap.style.top  = y + 'px';
+  armSvg.style.transform = `rotate(${rotate}deg)`;
+  armSvg.style.transformOrigin = '50% 50%';
+}
+
+function easeInOut(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+function easeOut(t)   { return 1 - Math.pow(1 - t, 3); }
+
+function lerpPos(a, b, t) {
+  return { x: a.x+(b.x-a.x)*t, y: a.y+(b.y-a.y)*t, rotate: a.rotate+(b.rotate-a.rotate)*t };
+}
+
+// Pick the closest screen edge to the click point
+function closestSide(tx, ty) {
+  const W = window.innerWidth, H = window.innerHeight;
+  const dists = { top: ty, bottom: H - ty, left: tx, right: W - tx };
+  return Object.entries(dists).sort((a,b) => a[1]-b[1])[0][0];
+}
+
+function slidedInPos(side, tx, ty) {
+  let x, y, rotate;
+  if (side === 'bottom') { rotate = 0;    x = tx - ARM_W/2;             y = ty - PAW_TIP_Y; }
+  if (side === 'top')    { rotate = 180;  x = tx - ARM_W/2;             y = ty - (ARM_H - PAW_TIP_Y); }
+  if (side === 'left')   { rotate = 90;   x = tx - PAW_TIP_Y;           y = ty - ARM_W/2; }
+  if (side === 'right')  { rotate = -90;  x = tx - (ARM_H - PAW_TIP_Y); y = ty - ARM_W/2; }
+  return { x, y, rotate };
+}
+
+function offScreenPos(side, inPos) {
+  const W = window.innerWidth, H = window.innerHeight;
+  const p = { ...inPos };
+  if (side === 'bottom') p.y = H + 20;
+  if (side === 'top')    p.y = -ARM_H - 20;
+  if (side === 'left')   p.x = -ARM_H - 20;
+  if (side === 'right')  p.x = W + 20;
+  return p;
+}
+
+function triggerArm(targetX, targetY) {
+  // Queue if busy — store last requested target
+  if (armAnim) {
+    armPending = { x: targetX, y: targetY };
+    return;
+  }
+
+  const side      = closestSide(targetX, targetY);
+  const inPos     = slidedInPos(side, targetX, targetY);
+  const startPos  = offScreenPos(side, inPos);
+
+  const pressDepth = 22;
+  const pressedPos = { ...inPos };
+  if (side === 'bottom') pressedPos.y += pressDepth;
+  if (side === 'top')    pressedPos.y -= pressDepth;
+  if (side === 'left')   pressedPos.x -= pressDepth;
+  if (side === 'right')  pressedPos.x += pressDepth;
+
+  const SLIDE_IN  = 380;
+  const PRESS     = 130;
+  const LIFT      = 110;
+  const SLIDE_OUT = 340;
+  const TOTAL     = SLIDE_IN + PRESS + LIFT + SLIDE_OUT;
+
+  armWrap.style.display = 'block';
+  let stamped = false;
+  const t0 = performance.now();
+
+  function tick(ts) {
+    const e = ts - t0;
+    let pos;
+
+    if (e < SLIDE_IN) {
+      pos = lerpPos(startPos, inPos, easeOut(e / SLIDE_IN));
+
+    } else if (e < SLIDE_IN + PRESS) {
+      const t = easeInOut((e - SLIDE_IN) / PRESS);
+      pos = lerpPos(inPos, pressedPos, t);
+      if (!stamped && t > 0.75) {
+        stamped = true;
+        spawnPaw(targetX, targetY);
+      }
+
+    } else if (e < SLIDE_IN + PRESS + LIFT) {
+      pos = lerpPos(pressedPos, inPos, easeOut((e - SLIDE_IN - PRESS) / LIFT));
+
+    } else if (e < TOTAL) {
+      pos = lerpPos(inPos, startPos, easeInOut((e - SLIDE_IN - PRESS - LIFT) / SLIDE_OUT));
+
+    } else {
+      armWrap.style.display = 'none';
+      armAnim = null;
+      // If another click was queued while animating, fire it now
+      if (armPending) {
+        const p = armPending; armPending = null;
+        triggerArm(p.x, p.y);
+      }
+      return;
+    }
+
+    setArmTransform(pos.x, pos.y, pos.rotate);
+    armAnim = requestAnimationFrame(tick);
+  }
+
+  armAnim = requestAnimationFrame(tick);
+}
+
+let armPending = null;
+armWrap.style.display = 'none';
+
+</script>
+</body>
+</html>

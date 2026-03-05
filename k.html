@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#d4a5a5" />
+    <meta name="description" content="Veresk - Магазин украшений из эпоксидной смолы. Ручная работа, уникальные дизайны." />
+    
+    <title>Veresk - Украшения из эпоксидной смолы</title>
+    
+    <!-- Favicon для магазина украшений -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💎</text></svg>">
+    
+    <!-- Preconnect для шрифтов -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Подключение Google Fonts для красивого текста -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Дополнительные мета-теги для SEO и социальных сетей -->
+    <meta property="og:title" content="Veresk - Украшения из эпоксидной смолы" />
+    <meta property="og:description" content="Ручная работа. Уникальные украшения с цветами и природными материалами." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://via.placeholder.com/1200x630/d4a5a5/ffffff?text=Veresk+Jewelry" />
+    
+    <style>
+        /* Пр1. CSS-препроцессоры (SASS) - эти стили будут дополнены основными SCSS стилями,
+           но добавляем базовые для предотвращения скачка контента при загрузке */
+        @font-face {
+            font-family: 'Avenir Next';
+            src: url('./fonts/Avenir Next.ttc') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Avenir Next', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            color: #333333;
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background 0.5s ease;
+            cursor: crosshair;
+        }
+        
+        body.paw-mode-active {
+            background: #1a1625;
+        }
+        
+        /* Стили для экрана загрузки */
+        #root {
+            min-height: 100vh;
+            position: relative;
+            z-index: 10;
+        }
+
+        .loading-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f9f9f9 0%, #f0e6e6 100%);
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .loading-screen h1 {
+            color: #d4a5a5;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .loading-screen p {
+            color: #b8b5b5;
+            font-size: 1.2rem;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Стили для ошибки загрузки */
+        .error-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .error-screen h1 {
+            color: #ff6b6b;
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .error-screen p {
+            color: #666;
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+        
+        .error-screen button {
+            background-color: #d4a5a5;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .error-screen button:hover {
+            background-color: #c08c8c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 165, 165, 0.3);
+        }
+        
+        /* Декоративные элементы для бренда */
+        .brand-decoration {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle at 30% 30%, #d4a5a5, #a7c7b3);
+            border-radius: 50%;
+            opacity: 0.2;
+            pointer-events: none;
+            z-index: 9999;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        
+        /* Стили для paw mode */
+        #paw-canvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 100;
+            display: none;
+        }
+        
+        body.paw-mode-active #paw-canvas {
+            display: block;
+        }
+        
+        #cat-arm-wrap {
+            position: fixed;
+            pointer-events: none;
+            z-index: 500;
+            display: none;
+        }
+        
+        body.paw-mode-active #cat-arm-wrap {
+            display: block;
+        }
+        
+        #cat-arm-svg {
+            display: block;
+            filter: drop-shadow(0 8px 24px rgba(0,0,0,0.5));
+        }
+        
+        #cat-arm-wrap.pressing #cat-arm-svg {
+            transform-origin: 50% 100%;
+            animation: armPress 0.18s ease-out;
+        }
+        
+        @keyframes armPress {
+            0%   { transform: scaleY(1); }
+            40%  { transform: scaleY(0.88); }
+            100% { transform: scaleY(1); }
+        }
+        
+        #paw-btn {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #d4a5a5, #a7c7b3);
+            font-size: 34px;
+            cursor: pointer;
+            box-shadow: 0 4px 24px rgba(212,165,165,0.3);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            z-index: 9998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        #paw-btn:hover { 
+            transform: scale(1.1); 
+            box-shadow: 0 6px 32px rgba(212,165,165,0.5);
+        }
+        
+        #paw-btn:active { transform: scale(0.93); }
+        
+        #paw-btn.active {
+            background: linear-gradient(135deg, #a7c7b3, #d4a5a5);
+            box-shadow: 0 4px 32px rgba(167,199,179,0.5);
+        }
+        
+        #mode-label {
+            position: fixed;
+            bottom: 50px;
+            right: 126px;
+            font-family: 'Comfortaa', cursive;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.8);
+            background: rgba(0,0,0,0.6);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.12);
+            white-space: nowrap;
+            z-index: 9997;
+            display: none;
+        }
+        
+        body.paw-mode-active #mode-label {
+            display: block;
+        }
+        
+        #counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            font-family: 'Comfortaa', cursive;
+            font-size: 1rem;
+            color: rgba(255,255,255,0.7);
+            letter-spacing: 1px;
+            z-index: 200;
+            background: rgba(0,0,0,0.4);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+            display: none;
+        }
+        
+        body.paw-mode-active #counter {
+            display: block;
+        }
+        
+        #counter span { color: #ff9ed2; font-weight: 700; }
+        
+        #clear-btn {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            font-family: 'Comfortaa', cursive;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.7);
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            z-index: 200;
+            transition: all 0.2s;
+            backdrop-filter: blur(5px);
+            display: none;
+        }
+        
+        body.paw-mode-active #clear-btn {
+            display: block;
+        }
+        
+        #clear-btn:hover { 
+            color: rgba(255,255,255,1); 
+            background: rgba(0,0,0,0.6);
+        }
+        
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .loading-screen h1 {
+                font-size: 2rem;
+                padding: 0 20px;
+                text-align: center;
+            }
+            
+            .error-screen h1 {
+                font-size: 2rem;
+            }
+            
+            .error-screen p {
+                font-size: 1rem;
+                padding: 0 20px;
+            }
+            
+            #mode-label {
+                bottom: 110px;
+                right: 20px;
+            }
+        }
+        
+        /* Скрытый контент для SEO */
+        .seo-hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Декоративный элемент бренда -->
+    <div class="brand-decoration" aria-hidden="true"></div>
+    
+    <!-- Элементы из surprise.html -->
+    <canvas id="paw-canvas"></canvas>
+    
+    <!-- Анимированная кошачья лапа -->
+    <div id="cat-arm-wrap">
+        <svg id="cat-arm-svg" width="160" height="340" viewBox="0 0 160 340" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="furGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%"   stop-color="#c8864a"/>
+                    <stop offset="40%"  stop-color="#e0a060"/>
+                    <stop offset="70%"  stop-color="#d09050"/>
+                    <stop offset="100%" stop-color="#b07030"/>
+                </linearGradient>
+                <linearGradient id="furGradDark" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%"   stop-color="#9a6030"/>
+                    <stop offset="50%"  stop-color="#c07840"/>
+                    <stop offset="100%" stop-color="#8a5020"/>
+                </linearGradient>
+                <radialGradient id="padGrad" cx="50%" cy="40%" r="60%">
+                    <stop offset="0%"   stop-color="#e8a0b0"/>
+                    <stop offset="100%" stop-color="#c06878"/>
+                </radialGradient>
+                <radialGradient id="toeGrad" cx="50%" cy="40%" r="60%">
+                    <stop offset="0%"   stop-color="#ebb0be"/>
+                    <stop offset="100%" stop-color="#c87888"/>
+                </radialGradient>
+                <pattern id="stripes" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(80)">
+                    <rect width="20" height="20" fill="none"/>
+                    <line x1="0" y1="0" x2="0" y2="20" stroke="#a06028" stroke-width="3" stroke-opacity="0.35"/>
+                </pattern>
+                <clipPath id="armClip">
+                    <path d="M 20,0 Q 10,80 8,160 Q 6,240 18,290 Q 30,330 80,338 Q 130,330 142,290 Q 154,240 152,160 Q 150,80 140,0 Z"/>
+                </clipPath>
+            </defs>
+            <path d="M 20,0 Q 10,80 8,160 Q 6,240 18,290 Q 30,330 80,338 Q 130,330 142,290 Q 154,240 152,160 Q 150,80 140,0 Z" fill="url(#furGradDark)" />
+            <path d="M 30,0 Q 22,80 20,160 Q 18,240 28,288 Q 40,328 80,334 Q 120,328 132,288 Q 142,240 140,160 Q 138,80 130,0 Z" fill="url(#furGrad)" />
+            <path d="M 30,0 Q 22,80 20,160 Q 18,240 28,288 Q 40,328 80,334 Q 120,328 132,288 Q 142,240 140,160 Q 138,80 130,0 Z" fill="url(#stripes)" opacity="0.5"/>
+            <path d="M 55,0 Q 50,100 52,200 Q 54,270 62,310 Q 70,332 80,334 Q 90,332 98,310 Q 106,270 108,200 Q 110,100 105,0 Z" fill="#e8b070" opacity="0.35"/>
+            <g stroke="#a06028" stroke-width="1.2" stroke-opacity="0.4" stroke-linecap="round" fill="none">
+                <line x1="22" y1="30"  x2="14" y2="44"/>
+                <line x1="20" y1="60"  x2="11" y2="74"/>
+                <line x1="18" y1="100" x2="10" y2="114"/>
+                <line x1="16" y1="140" x2="8"  y2="155"/>
+                <line x1="138" y1="30"  x2="146" y2="44"/>
+                <line x1="140" y1="60"  x2="148" y2="74"/>
+                <line x1="142" y1="100" x2="150" y2="114"/>
+                <line x1="144" y1="140" x2="152" y2="155"/>
+                <path d="M 32,70 Q 50,65 68,70" stroke-width="2.5" stroke-opacity="0.3"/>
+                <path d="M 92,70 Q 110,65 128,70" stroke-width="2.5" stroke-opacity="0.3"/>
+                <path d="M 28,130 Q 50,123 72,130" stroke-width="2.5" stroke-opacity="0.3"/>
+                <path d="M 88,130 Q 110,123 132,130" stroke-width="2.5" stroke-opacity="0.3"/>
+                <path d="M 26,195 Q 50,186 74,195" stroke-width="2.5" stroke-opacity="0.3"/>
+                <path d="M 86,195 Q 110,186 134,195" stroke-width="2.5" stroke-opacity="0.3"/>
+            </g>
+            <ellipse cx="80" cy="290" rx="52" ry="18" fill="#c07040" opacity="0.5"/>
+            <ellipse cx="80" cy="316" rx="36" ry="26" fill="url(#padGrad)"/>
+            <ellipse cx="72" cy="308" rx="14" ry="10" fill="white" opacity="0.18"/>
+            <path d="M 58,318 Q 80,326 102,318" stroke="#b05868" stroke-width="1.5" fill="none" opacity="0.4"/>
+            <ellipse cx="42" cy="295" rx="13" ry="15" fill="url(#toeGrad)"/>
+            <ellipse cx="39" cy="290" rx="5"  ry="4"  fill="white" opacity="0.22"/>
+            <ellipse cx="62" cy="284" rx="14" ry="16" fill="url(#toeGrad)"/>
+            <ellipse cx="59" cy="279" rx="5"  ry="4"  fill="white" opacity="0.22"/>
+            <ellipse cx="98" cy="284" rx="14" ry="16" fill="url(#toeGrad)"/>
+            <ellipse cx="95" cy="279" rx="5"  ry="4"  fill="white" opacity="0.22"/>
+            <ellipse cx="118" cy="295" rx="13" ry="15" fill="url(#toeGrad)"/>
+            <ellipse cx="115" cy="290" rx="5"  ry="4"  fill="white" opacity="0.22"/>
+            <g fill="#d4a0a8" opacity="0.55">
+                <path d="M 38,280 Q 34,272 36,266 Q 39,273 42,280 Z"/>
+                <path d="M 58,269 Q 55,260 57,254 Q 61,261 63,269 Z"/>
+                <path d="M 97,269 Q 99,260 103,254 Q 105,261 102,269 Z"/>
+                <path d="M 118,280 Q 122,272 124,266 Q 121,273 118,280 Z"/>
+            </g>
+        </svg>
+    </div>
+    
+    <!-- Корневой элемент React-приложения -->
+    <div id="root">
+        <!-- Контент для отображения во время загрузки React-приложения -->
+        <div class="loading-screen" id="loading-screen">
+            <h1>💎 Veresk</h1>
+            <p>Загружаем украшения ручной работы...</p>
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <div style="width: 12px; height: 12px; background: #d4a5a5; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite;"></div>
+                <div style="width: 12px; height: 12px; background: #a7c7b3; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite 0.3s;"></div>
+                <div style="width: 12px; height: 12px; background: #b8b5b5; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite 0.6s;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Элементы управления из surprise.html -->
+    <div id="counter">Отпечатков: <span id="count">0</span></div>
+    <button id="clear-btn">Очистить</button>
+    <div id="mode-label">Режим: обычный</div>
+    <button id="paw-btn">🐾</button>
+    
+    <!-- Нумерация страницы для SEO -->
+    <div class="seo-hidden" aria-hidden="true">
+        <h1>Veresk - Магазин украшений из эпоксидной смолы</h1>
+        <p>Ручная работа, уникальные украшения с цветами, эпоксидная смола, серьги, кулоны, браслеты, кольца.</p>
+        <p>Контакты: info@veresk.ru, +7 (999) 123-45-67</p>
+    </div>
+    
+    <!-- Скрипт для обработки ошибок загрузки React -->
+    <script>
+        // Функция для отображения ошибки, если React не загрузился
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            const root = document.getElementById('root');
+            if (root && !root.hasChildNodes()) {
+                root.innerHTML = `
+                    <div class="error-screen">
+                        <h1>Упс...</h1>
+                        <p>Что-то пошло не так при загрузке приложения. Пожалуйста, попробуйте обновить страницу.</p>
+                        <button onclick="location.reload()">Обновить страницу</button>
+                        <p style="margin-top: 40px; font-size: 0.9rem; color: #999;">
+                            Если ошибка повторяется, свяжитесь с нами: support@veresk.ru
+                        </p>
+                    </div>
+                `;
+            }
+            return false;
+        };
+        
+        // Убираем экран загрузки после полной загрузки React
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loadingScreen = document.getElementById('loading-screen');
+                if (loadingScreen && document.getElementById('root').children.length > 1) {
+                    loadingScreen.style.display = 'none';
+                }
+            }, 1000);
+        });
+        
+        // Добавляем поддержку PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js').catch(error => {
+                    console.log('ServiceWorker registration failed:', error);
+                });
+            });
+        }
+        
+        // Проверка поддержки современных функций
+        try {
+            eval("async function test() {}");
+        } catch (e) {
+            alert('Ваш браузер устарел. Пожалуйста, обновите его для корректной работы сайта.');
+        }
+    </script>
+    
+    <!-- Скрипт для функциональности кошачьих лапок -->
+    <script>
+        // ===== CANVAS =====
+        const canvas = document.getElementById('paw-canvas');
+        const ctx = canvas.getContext('2d');
+        const body = document.body;
+
+        function resizeCanvas() {
+            const tmp = document.createElement('canvas');
+            tmp.width = canvas.width; tmp.height = canvas.height;
+            if (canvas.width > 0 && canvas.height > 0) {
+                tmp.getContext('2d').drawImage(canvas, 0, 0);
+            }
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            if (tmp.width > 0 && tmp.height > 0) {
+                ctx.drawImage(tmp, 0, 0);
+            }
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // ===== STATE =====
+        let pawMode = false;
+        let pawCount = 0;
+        const paws = [];
+
+        // ===== AUDIO =====
+        let audioCtx = null;
+        function getAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            return audioCtx;
+        }
+        
+        function playMeow() {
+            try {
+                const ac = getAudio();
+                const dur = 0.35 + Math.random() * 0.45;
+                const f0 = 550 + Math.random() * 500;
+                const f1 = 280 + Math.random() * 220;
+                const osc = ac.createOscillator();
+                const gain = ac.createGain();
+                const filt = ac.createBiquadFilter();
+                osc.connect(filt); filt.connect(gain); gain.connect(ac.destination);
+                filt.type = 'bandpass'; filt.frequency.value = 1100; filt.Q.value = 4;
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(f0, ac.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(f1, ac.currentTime + dur * 0.65);
+                osc.frequency.exponentialRampToValueAtTime(f0 * 0.75, ac.currentTime + dur);
+                gain.gain.setValueAtTime(0, ac.currentTime);
+                gain.gain.linearRampToValueAtTime(0.2, ac.currentTime + 0.04);
+                gain.gain.linearRampToValueAtTime(0.1, ac.currentTime + dur * 0.55);
+                gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
+                osc.start(ac.currentTime);
+                osc.stop(ac.currentTime + dur);
+            } catch(e) {}
+        }
+
+        // ===== DIRTY PAW DRAWING =====
+        function seededJitter(seed, rx, factor = 0.25) {
+            const s = Math.sin(seed * 9301 + 49297) * 0.5 + 0.5;
+            return (s - 0.5) * rx * factor * 2;
+        }
+
+        function drawDirtyEllipse(ctx, x, y, rx, ry, tilt, seed) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(tilt);
+            ctx.beginPath();
+            const j = (i) => seededJitter(seed + i, rx);
+            ctx.moveTo(j(0), -ry + j(1));
+            ctx.bezierCurveTo(
+                rx * 0.55 + j(2),  -ry * 0.55 + j(3),
+                rx + j(4),          ry * 0.25 + j(5),
+                j(6),               ry + j(7)
+            );
+            ctx.bezierCurveTo(
+                -rx * 0.55 + j(8), ry * 0.7 + j(9),
+                -rx + j(10),       -ry * 0.25 + j(11),
+                j(12),             -ry + j(13)
+            );
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawPaw(cx, cy, angleDeg, scale, color, alpha, seed) {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = color;
+            ctx.translate(cx, cy);
+            ctx.rotate(angleDeg * Math.PI / 180);
+            ctx.scale(scale, scale);
+
+            const pw = 30, ph = 24;
+            drawDirtyEllipse(ctx, 0, 0, pw, ph, 0.12, seed);
+
+            const smearAlpha = alpha * 0.28;
+            ctx.save();
+            ctx.globalAlpha = smearAlpha;
+            drawDirtyEllipse(ctx, -8,  5, pw * 0.65, ph * 0.45,  0.45, seed + 20);
+            drawDirtyEllipse(ctx,  9, -4, pw * 0.55, ph * 0.40, -0.3,  seed + 40);
+            drawDirtyEllipse(ctx,  2,  8, pw * 0.50, ph * 0.38,  0.2,  seed + 60);
+            drawDirtyEllipse(ctx, -4, -7, pw * 0.45, ph * 0.35, -0.5,  seed + 80);
+            ctx.restore();
+
+            const toes = [
+                { ox: -19, oy: -28, rx: 11, ry: 12, rot: -0.38 },
+                { ox:  -6, oy: -35, rx: 12, ry: 13, rot: -0.10 },
+                { ox:   7, oy: -35, rx: 12, ry: 13, rot:  0.10 },
+                { ox:  19, oy: -28, rx: 11, ry: 12, rot:  0.38 },
+            ];
+
+            toes.forEach((t, i) => {
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.translate(t.ox, t.oy);
+                ctx.rotate(t.rot);
+
+                drawDirtyEllipse(ctx, 0, 0, t.rx, t.ry, 0, seed + 100 + i * 30);
+
+                ctx.globalAlpha = alpha * 0.25;
+                drawDirtyEllipse(ctx, -2,  3, t.rx * 0.6, t.ry * 0.5,  0.4, seed + 110 + i * 30);
+                drawDirtyEllipse(ctx,  3, -2, t.rx * 0.5, t.ry * 0.4, -0.3, seed + 120 + i * 30);
+                ctx.restore();
+            });
+
+            ctx.restore();
+        }
+
+        // ===== PALETTE =====
+        const COLORS = [
+            '#b8956a', '#9a7245', '#7d5535', '#6b4428',
+            '#c4a47c', '#a07850', '#8b6040', '#d0ae8a',
+        ];
+
+        // ===== SPAWN =====
+        function spawnPaw(x, y) {
+            const angle    = Math.random() * 360;
+            const scale    = 1.3 + Math.random() * 1.1;
+            const color    = COLORS[Math.floor(Math.random() * COLORS.length)];
+            const seed     = Math.random() * 9999;
+            const lifetime = 5000 + Math.random() * 4000;
+
+            paws.push({ x, y, angle, scale, color, alpha: 1, born: performance.now(), lifetime, seed });
+            drawPaw(x, y, angle, scale, color, 1, seed);
+
+            playMeow();
+            pawCount++;
+            document.getElementById('count').textContent = pawCount;
+        }
+
+        // ===== FADE LOOP =====
+        let lastT = 0;
+        function loop(ts) {
+            requestAnimationFrame(loop);
+            if (ts - lastT < 40) return;
+            lastT = ts;
+
+            const anyFading = paws.some(p => p.alpha < 1 && p.alpha > 0);
+            if (!anyFading) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (const p of paws) {
+                const age = ts - p.born;
+                const fadeStart = p.lifetime * 0.55;
+                if (age >= fadeStart) {
+                    p.alpha = Math.max(0, 1 - (age - fadeStart) / (p.lifetime * 0.45));
+                }
+                if (p.alpha > 0) drawPaw(p.x, p.y, p.angle, p.scale, p.color, p.alpha, p.seed);
+            }
+
+            for (let i = paws.length - 1; i >= 0; i--) {
+                if (paws[i].alpha <= 0) paws.splice(i, 1);
+            }
+        }
+        requestAnimationFrame(loop);
+
+        // ===== CONTROLS =====
+        const pawBtn    = document.getElementById('paw-btn');
+        const modeLabel = document.getElementById('mode-label');
+
+        pawBtn.addEventListener('click', () => {
+            pawMode = !pawMode;
+            pawBtn.classList.toggle('active', pawMode);
+            body.classList.toggle('paw-mode-active', pawMode);
+            modeLabel.textContent = pawMode ? '🐾 Режим: лапка!' : 'Режим: обычный';
+            document.body.style.cursor = pawMode ? 'none' : 'crosshair';
+            
+            if (pawMode) {
+                // Скрываем обычный контент при необходимости
+                const root = document.getElementById('root');
+                root.style.opacity = '0.3';
+            } else {
+                const root = document.getElementById('root');
+                root.style.opacity = '1';
+            }
+        });
+
+        document.addEventListener('click', e => {
+            if (e.target === pawBtn || e.target === document.getElementById('clear-btn')) return;
+            if (pawMode) triggerArm(e.clientX, e.clientY);
+        });
+
+        document.addEventListener('touchstart', e => {
+            if (!pawMode) return;
+            const t = e.touches[0];
+            triggerArm(t.clientX, t.clientY);
+        }, { passive: true });
+
+        document.getElementById('clear-btn').addEventListener('click', () => {
+            paws.length = 0;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            pawCount = 0;
+            document.getElementById('count').textContent = 0;
+        });
+
+        // ===== CUSTOM PAW CURSOR =====
+        const fakeCursor = document.createElement('canvas');
+        fakeCursor.width = 90; fakeCursor.height = 90;
+        fakeCursor.style.cssText = 'position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);display:none;';
+        document.body.appendChild(fakeCursor);
+        const fcc = fakeCursor.getContext('2d');
+
+        (function() {
+            fcc.save();
+            fcc.translate(45, 50);
+            fcc.globalAlpha = 0.7;
+            fcc.fillStyle = '#c4a47c';
+            fcc.beginPath(); fcc.ellipse(0, 5, 14, 11, 0, 0, Math.PI*2); fcc.fill();
+            [[-10,-11],[-3,-17],[4,-17],[11,-11]].forEach(([tx,ty]) => {
+                fcc.beginPath(); fcc.ellipse(tx, ty, 6, 7, 0, 0, Math.PI*2); fcc.fill();
+            });
+            fcc.restore();
+        })();
+
+        document.addEventListener('mousemove', e => {
+            if (!pawMode) return;
+            fakeCursor.style.left = e.clientX + 'px';
+            fakeCursor.style.top  = e.clientY + 'px';
+            fakeCursor.style.display = 'block';
+        });
+
+        // ===== ANIMATED CAT ARM =====
+        const armWrap = document.getElementById('cat-arm-wrap');
+        const armSvg  = document.getElementById('cat-arm-svg');
+
+        const ARM_W = 160;
+        const ARM_H = 340;
+        const PAW_TIP_Y = 330;
+
+        let armAnim = null;
+
+        function setArmTransform(x, y, rotate) {
+            armWrap.style.left = x + 'px';
+            armWrap.style.top  = y + 'px';
+            armSvg.style.transform = `rotate(${rotate}deg)`;
+            armSvg.style.transformOrigin = '50% 50%';
+        }
+
+        function easeInOut(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+        function easeOut(t)   { return 1 - Math.pow(1 - t, 3); }
+
+        function lerpPos(a, b, t) {
+            return { x: a.x+(b.x-a.x)*t, y: a.y+(b.y-a.y)*t, rotate: a.rotate+(b.rotate-a.rotate)*t };
+        }
+
+        function closestSide(tx, ty) {
+            const W = window.innerWidth, H = window.innerHeight;
+            const dists = { top: ty, bottom: H - ty, left: tx, right: W - tx };
+            return Object.entries(dists).sort((a,b) => a[1]-b[1])[0][0];
+        }
+
+        function slidedInPos(side, tx, ty) {
+            let x, y, rotate;
+            if (side === 'bottom') { rotate = 0;    x = tx - ARM_W/2;             y = ty - PAW_TIP_Y; }
+            if (side === 'top')    { rotate = 180;  x = tx - ARM_W/2;             y = ty - (ARM_H - PAW_TIP_Y); }
+            if (side === 'left')   { rotate = 90;   x = tx - PAW_TIP_Y;           y = ty - ARM_W/2; }
+            if (side === 'right')  { rotate = -90;  x = tx - (ARM_H - PAW_TIP_Y); y = ty - ARM_W/2; }
+            return { x, y, rotate };
+        }
+
+        function offScreenPos(side, inPos) {
+            const W = window.innerWidth, H = window.innerHeight;
+            const p = { ...inPos };
+            if (side === 'bottom') p.y = H + 20;
+            if (side === 'top')    p.y = -ARM_H - 20;
+            if (side === 'left')   p.x = -ARM_H - 20;
+            if (side === 'right')  p.x = W + 20;
+            return p;
+        }
+
+        function triggerArm(targetX, targetY) {
+            if (armAnim) {
+                armPending = { x: targetX, y: targetY };
+                return;
+            }
+
+            const side      = closestSide(targetX, targetY);
+            const inPos     = slidedInPos(side, targetX, targetY);
+            const startPos  = offScreenPos(side, inPos);
+
+            const pressDepth = 22;
+            const pressedPos = { ...inPos };
+            if (side === 'bottom') pressedPos.y += pressDepth;
+            if (side === 'top')    pressedPos.y -= pressDepth;
+            if (side === 'left')   pressedPos.x -= pressDepth;
+            if (side === 'right')  pressedPos.x += pressDepth;
+
+            const SLIDE_IN  = 380;
+            const PRESS     = 130;
+            const LIFT      = 110;
+            const SLIDE_OUT = 340;
+            const TOTAL     = SLIDE_IN + PRESS + LIFT + SLIDE_OUT;
+
+            armWrap.style.display = 'block';
+            let stamped = false;
+            const t0 = performance.now();
+
+            function tick(ts) {
+                const e = ts - t0;
+                let pos;
+
+                if (e < SLIDE_IN) {
+                    pos = lerpPos(startPos, inPos, easeOut(e / SLIDE_IN));
+                } else if (e < SLIDE_IN + PRESS) {
+                    const t = easeInOut((e - SLIDE_IN) / PRESS);
+                    pos = lerpPos(inPos, pressedPos, t);
+                    if (!stamped && t > 0.75) {
+                        stamped = true;
+                        spawnPaw(targetX, targetY);
+                    }
+                } else if (e < SLIDE_IN + PRESS + LIFT) {
+                    pos = lerpPos(pressedPos, inPos, easeOut((e - SLIDE_IN - PRESS) / LIFT));
+                } else if (e < TOTAL) {
+                    pos = lerpPos(inPos, startPos, easeInOut((e - SLIDE_IN - PRESS - LIFT) / SLIDE_OUT));
+                } else {
+                    armWrap.style.display = 'none';
+                    armAnim = null;
+                    if (armPending) {
+                        const p = armPending; armPending = null;
+                        triggerArm(p.x, p.y);
+                    }
+                    return;
+                }
+
+                setArmTransform(pos.x, pos.y, pos.rotate);
+                armAnim = requestAnimationFrame(tick);
+            }
+
+            armAnim = requestAnimationFrame(tick);
+        }
+
+        let armPending = null;
+        armWrap.style.display = 'none';
+        fakeCursor.style.display = 'none';
+    </script>
+</body>
+</html>
