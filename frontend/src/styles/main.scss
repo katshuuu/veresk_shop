@@ -2,31 +2,246 @@
 @import './variables';
 
 // Вложенные стили (nesting)
+@font-face {
+    font-family: 'Avenir Next';
+    src: url('./fonts/Avenir Next.ttc') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: 'Zvezda NHZDN';
+    src: url('./fonts/Zvezda NHZDN Bold Italic v.1.1.ttf') format('truetype');
+    font-weight: 700;
+    font-style: italic;
+}
+
+
+
 .app {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Avenir Next', Tahoma, Geneva, Verdana, sans-serif;
     color: $text-color;
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
 
-    h1 {
-        color: $primary-color;
-        text-align: center;
-        margin-bottom: 30px;
+    .api-tester-button {
+        background-color: #814357; // Переносим фон на кнопку
+        margin-inline-start: 43%;
+        color: white;
+        border: none; // Убираем стандартную границу
+        padding: 12px 40px;
+        border-radius: $border-radius;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+            background-color: darken(#9f1c1c, 10%); // Затемнение при наведении
+        }
         
-        &::after {
-            content: '✨';
-            margin-left: 10px;
+        .button-text {
+            background-color: transparent;
+            color: inherit;
+            border: none;
+            padding: 0;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: inherit;
+            transition: none;
+            
+            // Центрирование текста
+            display: inline-block;
+            text-align: center;
+            line-height: 1;
         }
     }
-    
+
+
+    h1 {
+        font-family: 'Zvezda NHZDN', 'Playfair Display', serif;
+        font-size: 70px;
+        font-weight: 700;
+        font-style: italic;
+        color: #d4a5a5;
+        text-decoration: none;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    h33 {
+        font-family: 'Avenir Next', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 40px;
+        margin-top: -7%;
+        margin-bottom: 5%;
+        font-weight: 700;
+        color: #d4a5a5;
+        text-decoration: none;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+
     .content {
         display: grid;
         grid-template-columns: 1fr 2fr;
         gap: 30px;
-        
-        @media (max-width: 768px) {
+
+        @media (max-width: 800px) {
             grid-template-columns: 1fr;
+        }
+    }
+}
+
+// Стили для списка товаров
+.product-list {
+    padding: 20px;
+
+    h2 {
+        color: $primary-color;
+        margin-bottom: 30px;
+        text-align: center;
+        font-size: 2rem;
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+        padding: 20px;
+    }
+
+    .product-card {
+        @include card-style;
+        transition: transform 0.3s, box-shadow 0.3s;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        &:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-image {
+            height: 200px;
+            background: linear-gradient(135deg, #f6f6f6, #e9e9e9);
+            border-radius: $border-radius;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: $primary-color;
+        }
+
+        h3 {
+            margin: 10px 0;
+            color: $text-color;
+            font-size: 1.2rem;
+            line-height: 1.4;
+        }
+
+        .price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: $primary-color;
+            margin: 10px 0;
+        }
+
+        .category {
+            color: lighten($text-color, 30%);
+            font-size: 0.9rem;
+            margin: 5px 0;
+        }
+
+        .stock {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin: 5px 0;
+
+            &.in-stock {
+                color: #4caf50;
+            }
+
+            &.out-of-stock {
+                color: #f44336;
+            }
+        }
+
+        .orders {
+            color: $secondary-color;
+            font-size: 0.9rem;
+            margin: 5px 0;
+        }
+
+        .buy-btn {
+            background-color: $primary-color;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: $border-radius;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: auto;
+            transition: background-color 0.3s;
+
+            &:hover:not(:disabled) {
+                background-color: darken($primary-color, 10%);
+            }
+
+            &:disabled {
+                background-color: #ccc;
+                cursor: not-allowed;
+            }
+        }
+    }
+}
+
+// Адаптивность для мобильных
+@media (max-width: 768px) {
+    .product-list {
+        .products-grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+    }
+}
+
+// Стили для табов
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 20px 0 30px;
+
+    .tab {
+        padding: 12px 30px;
+        border: none;
+        background: white;
+        color: $text-color;
+        font-size: 1.1rem;
+        cursor: pointer;
+        border-radius: $border-radius;
+        box-shadow: $box-shadow;
+        transition: all 0.3s;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        &.active {
+            background: $primary-color;
+            color: white;
         }
     }
 }
@@ -34,36 +249,38 @@
 // Использование миксинов
 .user-form {
     @include card-style;
-    
+
     h2 {
         color: $secondary-color;
-        margin-top: 0;
+        margin-top: 5;
+        font-size: 2rem;
     }
-    
+
     input {
-        width: 100%;
-        padding: 10px;
+        width: 87%;
+        padding: 20px;
         margin: 10px 0;
         border: 1px solid #ddd;
         border-radius: $border-radius;
-        font-size: 16px;
-        
+        font-size: 18px;
+
         &:focus {
             outline: none;
             border-color: $primary-color;
         }
     }
-    
+
     button {
         background-color: $primary-color;
         color: white;
-        border: none;
-        padding: 12px 24px;
+        border: rgb(109, 51, 57);
+        margin: 12px 0;
+        padding: 12px 40px;
         border-radius: $border-radius;
         cursor: pointer;
         font-size: 16px;
         transition: background-color 0.3s;
-        
+
         &:hover {
             background-color: darken($primary-color, 10%);
         }
@@ -72,35 +289,36 @@
 
 .user-list {
     @include card-style;
-    
+
     h2 {
         color: $secondary-color;
-        margin-top: 0;
+        margin-top: 5;
+        font-size: 2rem;
     }
-    
+
     .user-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 15px;
         border-bottom: 1px solid #eee;
-        
+
         &:last-child {
             border-bottom: none;
         }
-        
+
         .user-info {
             h3 {
                 margin: 0 0 5px 0;
                 color: $primary-color;
             }
-            
+
             p {
                 margin: 0;
                 color: lighten($text-color, 20%);
             }
         }
-        
+
         .actions {
             button {
                 margin-left: 10px;
@@ -108,12 +326,12 @@
                 border: none;
                 border-radius: 4px;
                 cursor: pointer;
-                
+
                 &.edit {
                     background-color: $accent-color;
                     color: white;
                 }
-                
+
                 &.delete {
                     background-color: #ff6b6b;
                     color: white;

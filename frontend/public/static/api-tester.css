@@ -1,0 +1,56 @@
+/* Дополнительные стили для API Tester */
+.endpoint-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.endpoint-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: #d4a5a5;
+    transform: scaleY(0);
+    transition: transform 0.3s;
+}
+
+.endpoint-item:hover::before {
+    transform: scaleY(1);
+}
+
+.endpoint-item.selected::before {
+    transform: scaleY(1);
+}
+
+/* Анимация для кнопки отправки */
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(212, 165, 165, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(212, 165, 165, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(212, 165, 165, 0); }
+}
+
+.send-btn:not(:disabled) {
+    animation: pulse 2s infinite;
+}
+
+/* Стили для скроллбара */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #d4a5a5;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #c08c8c;
+}

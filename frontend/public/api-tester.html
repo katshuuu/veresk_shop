@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veresk API Tester - Тестирование эндпоинтов</title>
+    
+    <!-- Подключение шрифтов -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Подключение Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Подключение стилей -->
+    <link rel="stylesheet" href="/static/api-tester.css">
+    
+    <style>
+        /* Встроенные стили для быстрой загрузки */
+        @font-face {
+            font-family: 'Avenir Next';
+            src: url('./fonts/Avenir Next.ttc') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Zvezda NHZDN';
+            src: url('./fonts/Zvezda NHZDN Bold Italic v.1.1.ttf') format('truetype');
+            font-weight: 700;
+            font-style: italic;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Avenir Next', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f9f9f9 0%, #f0e6e6 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Стили для навигации */
+        .nav-bar {
+            background: white;
+            border-radius: 15px;
+            padding: 15px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(212, 165, 165, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-family: 'Zvezda NHZDN', 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            font-style: italic;
+            color: #d4a5a5;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 28px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-link {
+            color: #666;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            background: #f0e6e6;
+            color: #d4a5a5;
+        }
+        
+        .nav-link.active {
+            background: #d4a5a5;
+            color: white;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: #d4a5a5;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+        
+        /* Стили для боковой панели с эндпоинтами */
+        .endpoints-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+        
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0e6e6;
+        }
+        
+        .panel-title i {
+            font-size: 24px;
+            color: #d4a5a5;
+        }
+        
+        .panel-title h2 {
+            font-size: 1.3rem;
+            color: #333;
+        }
+        
+        .endpoint-group {
+            margin-bottom: 25px;
+        }
+        
+        .group-title {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #b8b5b5;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .endpoint-item {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .endpoint-item:hover {
+            background: #f0e6e6;
+            transform: translateX(5px);
+        }
+        
+        .endpoint-item.selected {
+            border-color: #d4a5a5;
+            background: #fff5f5;
+        }
+        
+        .endpoint-method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 10px;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .method-get { background: #e3f2fd; color: #1976d2; }
+        .method-post { background: #e8f5e9; color: #388e3c; }
+        .method-put { background: #fff3e0; color: #f57c00; }
+        .method-delete { background: #ffebee; color: #d32f2f; }
+        .method-patch { background: #f3e5f5; color: #7b1fa2; }
+        
+        .endpoint-path {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #333;
+        }
+        
+        .endpoint-desc {
+            font-size: 0.85rem;
+            color: #999;
+            margin-left: 75px;
+        }
+        
+        /* Стили для панели запросов */
+        .request-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .request-form {
+            margin-bottom: 30px;
+        }
+        
+        .url-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .method-select {
+            width: 120px;
+            padding: 12px;
+            border: 2px solid #f0e6e6;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .method-select:hover {
+            border-color: #d4a5a5;
+        }
+        
+        .url-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #f0e6e6;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .url-input:focus {
+            outline: none;
+            border-color: #d4a5a5;
+        }
+        
+        .send-btn {
+            padding: 12px 30px;
+            background: #d4a5a5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .send-btn:hover {
+            background: #c08c8c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 165, 165, 0.3);
+        }
+        
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .request-body {
+            margin-top: 20px;
+        }
+        
+        .request-body textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #f0e6e6;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            resize: vertical;
+            transition: all 0.3s;
+        }
+        
+        .request-body textarea:focus {
+            outline: none;
+            border-color: #d4a5a5;
+        }
+        
+        .request-body label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        /* Стили для результатов */
+        .response-panel {
+            background: #1e1e1e;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .response-header {
+            background: #2d2d2d;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        
+        .response-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .status-success { background: #4caf50; color: white; }
+        .status-error { background: #f44336; color: white; }
+        .status-warning { background: #ff9800; color: white; }
+        
+        .response-time {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        .response-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .response-actions button {
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .response-actions button:hover {
+            background: #3d3d3d;
+            color: white;
+        }
+        
+        .response-body {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .response-body pre {
+            margin: 0;
+            color: #fff;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        /* Стили для JSON подсветки */
+        .json-key { color: #9cdcfe; }
+        .json-string { color: #ce9178; }
+        .json-number { color: #b5cea8; }
+        .json-boolean { color: #569cd6; }
+        .json-null { color: #569cd6; }
+        
+        /* Стили для пресетов */
+        .presets {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        
+        .presets-title {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .preset-btn {
+            padding: 8px 15px;
+            background: white;
+            border: 2px solid #f0e6e6;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .preset-btn:hover {
+            border-color: #d4a5a5;
+            background: #fff5f5;
+        }
+        
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #999;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Навигация -->
+        <nav class="nav-bar">
+            <a href="/" class="logo">
+                <i class="fas fa-gem"></i>
+                Veresk API Tester
+            </a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">
+                    <i class="fas fa-home"></i> Главная
+                </a>
+                <a href="/api-tester.html" class="nav-link active">
+                    <i class="fas fa-flask"></i> API Tester
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-book"></i> Документация
+                </a>
+            </div>
+        </nav>
+        
+        <!-- Заголовок -->
+        <div class="header">
+            <h1>🛠️ API Test Panel</h1>
+            <p> Все эндпоинты магазина Veresk в удобном интерфейсе</p>
+        </div>
+        
+        <!-- Основной контент -->
+        <div class="main-content">
+            <!-- Боковая панель с эндпоинтами -->
+            <div class="endpoints-panel">
+                <div class="panel-title">
+                    <i class="fas fa-list"></i>
+                    <h2>Доступные эндпоинты</h2>
+                </div>
+                
+                <!-- Пр4. REST API CRUD (User) -->
+                <div class="endpoint-group">
+                    <div class="group-title">
+                        <i class="fas fa-users"></i> Пользователи (CRUD)
+                    </div>
+                    
+                    <div class="endpoint-item" onclick="selectEndpoint('GET', '/api/users', 'Получить всех пользователей')">
+                        <span class="endpoint-method method-get">GET</span>
+                        <span class="endpoint-path">/api/users</span>
+                        <div class="endpoint-desc">Получить список всех пользователей</div>
+                    </div>
+                    
+                    <div class="endpoint-item" onclick="selectEndpoint('GET', '/api/users/1', 'Получить пользователя по ID')">
+                        <span class="endpoint-method method-get">GET</span>
+                        <span class="endpoint-path">/api/users/:id</span>
+                        <div class="endpoint-desc">Получить пользователя по ID</div>
+                    </div>
+                    
+                    <div class="endpoint-item" onclick="selectEndpoint('POST', '/api/users', 'Создать нового пользователя')">
+                        <span class="endpoint-method method-post">POST</span>
+                        <span class="endpoint-path">/api/users</span>
+                        <div class="endpoint-desc">Создать нового пользователя</div>
+                    </div>
+                    
+                    <div class="endpoint-item" onclick="selectEndpoint('PUT', '/api/users/1', 'Обновить пользователя')">
+                        <span class="endpoint-method method-put">PUT</span>
+                        <span class="endpoint-path">/api/users/:id</span>
+                        <div class="endpoint-desc">Полностью обновить пользователя</div>
+                    </div>
+                    
+                    <div class="endpoint-item" onclick="selectEndpoint('PATCH', '/api/users/1', 'Частично обновить пользователя')">
+                        <span class="endpoint-method method-patch">PATCH</span>
+                        <span class="endpoint-path">/api/users/:id</span>
+                        <div class="endpoint-desc">Частично обновить пользователя</div>
+                    </div>
+                    
+                    <div class="endpoint-item" onclick="selectEndpoint('DELETE', '/api/users/1', 'Удалить пользователя')">
+                        <span class="endpoint-method method-delete">DELETE</span>
+                        <span class="endpoint-path">/api/users/:id</span>
+                        <div class="endpoint-desc">Удалить пользователя</div>
+                    </div>
+                </div>
+                
+                <!-- Пр5. REST API расширенный (Relations + Aggregation) -->
+                <div class="endpoint-group">
+                    <div class="group-title">
+                        <i class="fas fa-chart-line"></i> Расширенные запросы
+                    </div>
+                    
+                    <div class="endpoint-item" onclick="selectEndpoint('GET', '/api/users/1/with-orders', 'Пользователь с заказами')">
+                        <span class="endpoint-method method-get">GET</span>
+                        <span class="endpoint-path">/api/users/:id/with-orders</span>
+                        <div class="endpoint-desc">Пользователь с деталями заказов (Relations)</div>
+                    </div>
+                    
+                    <div class="endpoint-item" onclick="selectEndpoint('GET', '/api/products/aggregated', 'Агрегация товаров')">
+                        <span class="endpoint-method method-get">GET</span>
+                        <span class="endpoint-path">/api/products/aggregated</span>
+                        <div class="endpoint-desc">Группировка товаров по категориям</div>
+                    </div>
+                    
+                    <div class="endpoint-item" onclick="selectEndpoint('GET', '/api/products/statistics', 'Статистика товаров')">
+                        <span class="endpoint-method method-get">GET</span>
+                        <span class="endpoint-path">/api/products/statistics</span>
+                        <div class="endpoint-desc">Полная статистика по товарам</div>
+                    </div>
+                    
+                    <div class="endpoint-item" onclick="selectEndpoint('GET', '/api/products/category/кулоны', 'Товары по категории')">
+                        <span class="endpoint-method method-get">GET</span>
+                        <span class="endpoint-path">/api/products/category/:category</span>
+                        <div class="endpoint-desc">Фильтр товаров по категории</div>
+                    </div>
+                </div>
+                
+                <!-- Товары -->
+                <div class="endpoint-group">
+                    <div class="group-title">
+                        <i class="fas fa-gem"></i> Товары
+                    </div>
+                    
+                    <div class="endpoint-item" onclick="selectEndpoint('GET', '/api/products', 'Все товары')">
+                        <span class="endpoint-method method-get">GET</span>
+                        <span class="endpoint-path">/api/products</span>
+                        <div class="endpoint-desc">Получить все товары</div>
+                    </div>
+                </div>
+                
+                <!-- Пр3. JSON + внешние API -->
+                <div class="endpoint-group">
+                    <div class="group-title">
+                        <i class="fas fa-cloud"></i> Внешние API
+                    </div>
+                    
+                    <div class="endpoint-item" onclick="selectEndpoint('GET', '/api/external-joke', 'Случайная шутка')">
+                        <span class="endpoint-method method-get">GET</span>
+                        <span class="endpoint-path">/api/external-joke</span>
+                        <div class="endpoint-desc">Получить случайную шутку</div>
+                    </div>
+                </div>
+                
+                <!-- Базовые -->
+                <div class="endpoint-group">
+                    <div class="group-title">
+                        <i class="fas fa-info-circle"></i> Базовые
+                    </div>
+                    
+                    <div class="endpoint-item" onclick="selectEndpoint('GET', '/', 'Главная API')">
+                        <span class="endpoint-method method-get">GET</span>
+                        <span class="endpoint-path">/</span>
+                        <div class="endpoint-desc">Информация о сервере</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Панель запросов -->
+            <div class="request-panel">
+                <div class="request-form">
+                    <div class="url-bar">
+                        <select id="method" class="method-select">
+                            <option value="GET">GET</option>
+                            <option value="POST">POST</option>
+                            <option value="PUT">PUT</option>
+                            <option value="PATCH">PATCH</option>
+                            <option value="DELETE">DELETE</option>
+                        </select>
+                        <input type="text" id="url" class="url-input" placeholder="Введите URL эндпоинта" value="http://localhost:5001/api/users">
+                        <button id="sendBtn" class="send-btn" onclick="sendRequest()">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Отправить</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Тело запроса (для POST/PUT/PATCH) -->
+                    <div class="request-body" id="requestBodyContainer" style="display: none;">
+                        <label>
+                            <i class="fas fa-code"></i> Тело запроса (JSON):
+                        </label>
+                        <textarea id="requestBody" placeholder='{
+    "name": "Новый пользователь",
+    "email": "user@example.com"
+}'>{
+    "name": "Тестовый пользователь",
+    "email": "test@example.com"
+}</textarea>
+                    </div>
+                    
+                    <!-- Пресеты -->
+                    <div class="presets">
+                        <div class="presets-title">
+                            <i class="fas fa-rocket"></i>
+                            Быстрые тесты:
+                        </div>
+                        <div class="preset-buttons">
+                            <button class="preset-btn" onclick="testGetAllUsers()">
+                                <i class="fas fa-users"></i> Все пользователи
+                            </button>
+                            <button class="preset-btn" onclick="testGetAllProducts()">
+                                <i class="fas fa-gem"></i> Все товары
+                            </button>
+                            <button class="preset-btn" onclick="testCreateUser()">
+                                <i class="fas fa-user-plus"></i> Создать пользователя
+                            </button>
+                            <button class="preset-btn" onclick="testAggregation()">
+                                <i class="fas fa-chart-pie"></i> Агрегация товаров
+                            </button>
+                            <button class="preset-btn" onclick="testExternalAPI()">
+                                <i class="fas fa-cloud"></i> Внешнее API
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Результат запроса -->
+                <div class="response-panel" id="responsePanel">
+                    <div class="response-header">
+                        <div class="response-status">
+                            <span class="status-badge status-success" id="statusBadge">200 OK</span>
+                            <span class="response-time" id="responseTime">0 ms</span>
+                        </div>
+                        <div class="response-actions">
+                            <button onclick="copyResponse()" title="Копировать">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button onclick="formatResponse()" title="Форматировать">
+                                <i class="fas fa-format"></i>
+                            </button>
+                            <button onclick="clearResponse()" title="Очистить">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="response-body" id="responseBody">
+                        <pre id="responsePre">Нажмите "Отправить" для выполнения запроса</pre>
+                    </div>
+                </div>
+                
+                <!-- Информация о кодах ответов -->
+                <div style="margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 10px; font-size: 0.9rem;">
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <span style="color: #4caf50;">✓ 200 OK - Успешный запрос</span>
+                        <span style="color: #4caf50;">✓ 201 Created - Создано</span>
+                        <span style="color: #4caf50;">✓ 204 No Content - Успешно удалено</span>
+                        <span style="color: #f44336;">✗ 404 Not Found - Не найдено</span>
+                        <span style="color: #ff9800;">⚠ 400 Bad Request - Ошибка валидации</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Футер -->
+        <div class="footer">
+            <p>Veresk API Tester v1.0 | Тестирование всех эндпоинтов проекта</p>
+            <p style="margin-top: 5px; font-size: 0.8rem;">Пр2. Node.js + Express | Пр3. JSON + внешние API | Пр4. CRUD User | Пр5. Relations + Aggregation</p>
+        </div>
+    </div>
+    
+    <script>
+        // Базовый URL API
+        const BASE_URL = 'http://localhost:5001';
+        
+        // Выбор эндпоинта из списка
+        function selectEndpoint(method, path, description) {
+            document.getElementById('method').value = method;
+            document.getElementById('url').value = BASE_URL + path;
+            
+            // Показываем/скрываем тело запроса
+            const bodyContainer = document.getElementById('requestBodyContainer');
+            if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
+                bodyContainer.style.display = 'block';
+                
+                // Заполняем тело запроса в зависимости от эндпоинта
+                if (path.includes('/users')) {
+                    if (method === 'POST') {
+                        document.getElementById('requestBody').value = JSON.stringify({
+                            name: "Новый пользователь",
+                            email: "newuser@example.com"
+                        }, null, 2);
+                    } else if (method === 'PUT' || method === 'PATCH') {
+                        document.getElementById('requestBody').value = JSON.stringify({
+                            name: "Обновленное имя",
+                            email: "updated@example.com"
+                        }, null, 2);
+                    }
+                }
+            } else {
+                bodyContainer.style.display = 'none';
+            }
+            
+            // Подсветка выбранного элемента
+            document.querySelectorAll('.endpoint-item').forEach(el => {
+                el.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+        }
+        
+        // Отправка запроса
+        async function sendRequest() {
+            const method = document.getElementById('method').value;
+            const url = document.getElementById('url').value;
+            const sendBtn = document.getElementById('sendBtn');
+            const originalText = sendBtn.innerHTML;
+            
+            // Показываем загрузку
+            sendBtn.innerHTML = '<span class="loader"></span> Отправка...';
+            sendBtn.disabled = true;
+            
+            const startTime = performance.now();
+            
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                // Добавляем тело запроса для методов, которые его поддерживают
+                if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
+                    const bodyText = document.getElementById('requestBody').value;
+                    try {
+                        // Проверяем, что это валидный JSON
+                        JSON.parse(bodyText);
+                        options.body = bodyText;
+                    } catch (e) {
+                        alert('Ошибка: Невалидный JSON в теле запроса');
+                        return;
+                    }
+                }
+                
+                const response = await fetch(url, options);
+                const endTime = performance.now();
+                const responseTime = Math.round(endTime - startTime);
+                
+                let data;
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    data = await response.text();
+                }
+                
+                // Обновляем UI с результатом
+                displayResponse(response, data, responseTime);
+                
+            } catch (error) {
+                document.getElementById('responsePre').textContent = 'Ошибка: ' + error.message;
+                document.getElementById('statusBadge').textContent = 'Error';
+                document.getElementById('statusBadge').className = 'status-badge status-error';
+            } finally {
+                // Восстанавливаем кнопку
+                sendBtn.innerHTML = originalText;
+                sendBtn.disabled = false;
+            }
+        }
+        
+        // Отображение ответа
+        function displayResponse(response, data, responseTime) {
+            const statusBadge = document.getElementById('statusBadge');
+            const responsePre = document.getElementById('responsePre');
+            const responseTimeSpan = document.getElementById('responseTime');
+            
+            // Устанавливаем статус
+            statusBadge.textContent = `${response.status} ${response.statusText}`;
+            if (response.status >= 200 && response.status < 300) {
+                statusBadge.className = 'status-badge status-success';
+            } else if (response.status >= 400 && response.status < 500) {
+                statusBadge.className = 'status-badge status-warning';
+            } else if (response.status >= 500) {
+                statusBadge.className = 'status-badge status-error';
+            }
+            
+            // Устанавливаем время ответа
+            responseTimeSpan.textContent = `${responseTime} ms`;
+            
+            // Форматируем и отображаем данные
+            if (typeof data === 'object') {
+                responsePre.textContent = JSON.stringify(data, null, 2);
+            } else {
+                responsePre.textContent = data;
+            }
+        }
+        
+        // Копирование ответа
+        function copyResponse() {
+            const text = document.getElementById('responsePre').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Ответ скопирован в буфер обмена');
+            });
+        }
+        
+        // Форматирование JSON
+        function formatResponse() {
+            const pre = document.getElementById('responsePre');
+            try {
+                const json = JSON.parse(pre.textContent);
+                pre.textContent = JSON.stringify(json, null, 2);
+            } catch (e) {
+                // Не JSON, ничего не делаем
+            }
+        }
+        
+        // Очистка ответа
+        function clearResponse() {
+            document.getElementById('responsePre').textContent = 'Ответ очищен';
+        }
+        
+        // Пресеты для быстрого тестирования
+        function testGetAllUsers() {
+            document.getElementById('method').value = 'GET';
+            document.getElementById('url').value = `${BASE_URL}/api/users`;
+            document.getElementById('requestBodyContainer').style.display = 'none';
+            sendRequest();
+        }
+        
+        function testGetAllProducts() {
+            document.getElementById('method').value = 'GET';
+            document.getElementById('url').value = `${BASE_URL}/api/products`;
+            document.getElementById('requestBodyContainer').style.display = 'none';
+            sendRequest();
+        }
+        
+        function testCreateUser() {
+            document.getElementById('method').value = 'POST';
+            document.getElementById('url').value = `${BASE_URL}/api/users`;
+            document.getElementById('requestBodyContainer').style.display = 'block';
+            document.getElementById('requestBody').value = JSON.stringify({
+                name: "Тестовый пользователь",
+                email: "test@example.com"
+            }, null, 2);
+            sendRequest();
+        }
+        
+        function testAggregation() {
+            document.getElementById('method').value = 'GET';
+            document.getElementById('url').value = `${BASE_URL}/api/products/aggregated`;
+            document.getElementById('requestBodyContainer').style.display = 'none';
+            sendRequest();
+        }
+        
+        function testExternalAPI() {
+            document.getElementById('method').value = 'GET';
+            document.getElementById('url').value = `${BASE_URL}/api/external-joke`;
+            document.getElementById('requestBodyContainer').style.display = 'none';
+            sendRequest();
+        }
+        
+        // Показываем/скрываем тело запроса при изменении метода
+        document.getElementById('method').addEventListener('change', function() {
+            const bodyContainer = document.getElementById('requestBodyContainer');
+            if (this.value === 'POST' || this.value === 'PUT' || this.value === 'PATCH') {
+                bodyContainer.style.display = 'block';
+            } else {
+                bodyContainer.style.display = 'none';
+            }
+        });
+        
+        // Добавляем подсветку JSON (опционально)
+        function syntaxHighlight(json) {
+            // Можно добавить библиотеку для подсветки, например highlight.js
+        }
+    </script>
+</body>
+</html>

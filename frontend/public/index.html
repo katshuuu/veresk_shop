@@ -29,10 +29,16 @@
     <style>
         /* Пр1. CSS-препроцессоры (SASS) - эти стили будут дополнены основными SCSS стилями,
            но добавляем базовые для предотвращения скачка контента при загрузке */
-        body {
+        @font-face {
+                font-family: 'Avenir Next';
+                src: url('./fonts/Avenir Next.ttc') format('truetype');
+                font-weight: normal;
+                font-style: normal;
+            }
+           body {
             margin: 0;
             padding: 0;
-            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            font-family: 'Avenir Next', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f9f9f9;
             color: #333333;
             line-height: 1.6;
@@ -43,7 +49,7 @@
         #root {
             min-height: 100vh;
         }
-        
+
         .loading-screen {
             display: flex;
             flex-direction: column;
@@ -181,7 +187,7 @@
             if (root && !root.hasChildNodes()) {
                 root.innerHTML = `
                     <div class="error-screen">
-                        <h1>😕 Упс...</h1>
+                        <h1>Упс...</h1>
                         <p>Что-то пошло не так при загрузке приложения. Пожалуйста, попробуйте обновить страницу.</p>
                         <button onclick="location.reload()">Обновить страницу</button>
                         <p style="margin-top: 40px; font-size: 0.9rem; color: #999;">

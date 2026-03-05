@@ -21,7 +21,7 @@ const UserList = ({ onEditUser, refreshTrigger }) => {
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Вы уверены, что хотите удалить пользователя?')) {
+        if (window.confirm('Уверены, что хотите удалить пользователя?')) {
             try {
                 await axios.delete(`http://localhost:5001/api/users/${id}`);
                 fetchUsers(); // Refresh the list
